@@ -72,7 +72,9 @@ let index = 0;
 choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
 lettersElements.forEach((letterElement) => {
   letterElement.onclick = checker;
-  document.addEventListener("keypress", (e) => {
+});
+document.addEventListener("keypress", (e) => {
+  lettersElements.forEach((letterElement) => {
     if (
       e.key.toUpperCase() === letterElement.innerHTML &&
       lettersContainer.style.pointerEvents !== "none"
@@ -85,7 +87,6 @@ lettersElements.forEach((letterElement) => {
     }
   });
 });
-
 function checker() {
   if (choosenWord.indexOf(this.innerHTML) !== -1) {
     document.querySelectorAll(".guess-word")[
