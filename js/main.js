@@ -65,7 +65,8 @@ if (choosenWord.indexOf(" ") !== -1) {
 }
 
 // console.log(choosenWord);
-
+let wrongTries = 0;
+let wrongAttemptSpan = document.querySelector(".wrong-attempts span");
 let loseComponentsElements = document.querySelectorAll(".comp");
 // making copy of the choosen word to display it when player lose
 let choosenWordCopy = choosenWord;
@@ -83,6 +84,7 @@ lettersElements.forEach((letterElement) => {
       // checkinng wether all guess-words in html are not empty [ has character in html ]
       checkWinCondition();
     } else {
+      wrongAttemptSpan.innerHTML = ++wrongTries;
       this.classList.add("wrong");
       playSoundFx("failure");
       if (indexOfLoseComponent < loseComponentsElements.length) {

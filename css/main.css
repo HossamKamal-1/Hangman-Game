@@ -68,9 +68,16 @@ hr {
 }
 .game-info {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+@media (max-width: 767px) {
+  .game-info {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 .game-info .game-name {
-  flex: 0.2;
   color: #009688;
   font-weight: bold;
   font-size: 20px;
@@ -80,8 +87,10 @@ hr {
   padding: 5px;
   border-radius: 6px;
 }
+.game-info .wrong-attempts {
+  color: white;
+}
 .game-info .category {
-  flex: 1;
   text-align: right;
   color: white;
 }
@@ -103,6 +112,7 @@ hr {
   position: relative;
   margin: auto;
   z-index: 1;
+  display: none;
 }
 @media (max-width: 520px) {
   .hangman-draw .the-draw {
@@ -216,6 +226,7 @@ hr {
   left: 130px;
   transform: rotate(30deg);
 }
+.hangman-draw .the-draw.visible,
 .hangman-draw .the-man .legs.visible,
 .hangman-draw .the-man .hands.visible,
 .hangman-draw .the-man .body.visible,
