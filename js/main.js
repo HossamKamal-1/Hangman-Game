@@ -57,14 +57,16 @@ let lettersElements = document.querySelectorAll(".letter-box");
   guessWordSpan.className = "guess-word";
   document.querySelector(".letters-guess").appendChild(guessWordSpan);
 });
+
+let guessWordsSpans = document.querySelectorAll(".guess-word");
 // if there is 2 segment  word make space between 2 words
 if (choosenWord.indexOf(" ") !== -1) {
-  document.querySelectorAll(".guess-word")[
-    choosenWord.indexOf(" ")
-  ].style.marginLeft = "20px";
+  guessWordsSpans[choosenWord.indexOf(" ")].style.marginLeft = "20px";
 }
 
 // console.log(choosenWord);
+
+let loseComponentsElements = document.querySelectorAll(".comp");
 // making copy of the choosen word to display it when player lose
 let choosenWordCopy = choosenWord;
 let indexOfLoseComponent = 0;
@@ -74,33 +76,28 @@ lettersElements.forEach((letterElement) => {
   letterElement.onclick = function () {
     if (choosenWord.indexOf(this.innerHTML) !== -1) {
       playSoundFx("success");
-      document.querySelectorAll(".guess-word")[
-        choosenWord.indexOf(this.innerHTML)
-      ].innerHTML = this.innerHTML;
+      let indexOfLetter = choosenWord.indexOf(this.innerHTML);
+      guessWordsSpans[indexOfLetter].innerHTML = this.innerHTML;
       // replacing character of the choosen word with (.)
-      choosenWord = choosenWord.replace(
-        choosenWord.charAt(choosenWord.indexOf(this.innerHTML)),
-        "."
-      );
+      choosenWord = choosenWord.replace(choosenWord[indexOfLetter], ".");
       // checkinng wether all guess-words in html are not empty [ has character in html ]
       checkWinCondition();
     } else {
       this.classList.add("wrong");
       playSoundFx("failure");
-      if (indexOfLoseComponent < document.querySelectorAll(".comp").length) {
-        document
-          .querySelectorAll(".comp")
-          [indexOfLoseComponent++].classList.add("visible");
+      if (indexOfLoseComponent < loseComponentsElements.length) {
+        loseComponentsElements[indexOfLoseComponent++].classList.add("visible");
       }
       // checking if all component elements has class visible or not
       checkLoseCondition();
     }
   };
 });
+
 document.addEventListener("keydown", keyDownHandler);
-document.querySelector(".retry").addEventListener("click", (e) => {
-  location.reload();
-});
+document
+  .querySelector(".retry")
+  .addEventListener("click", (e) => location.reload());
 
 function keyDownHandler(e) {
   lettersElements.forEach((letterElement) => {
@@ -119,9 +116,7 @@ function keyDownHandler(e) {
 }
 function checkWinCondition() {
   if (
-    Array.from(document.querySelectorAll(".guess-word")).every(
-      (guessWord) => guessWord.innerHTML !== ""
-    )
+    Array.from(guessWordsSpans).every((guessWord) => guessWord.innerHTML !== "")
   ) {
     setTimeout(() => playSoundFx("win"), 600);
     // stop interaction + removing keydown Event Listener when the player win + show msg
@@ -142,7 +137,7 @@ function showResultMsg(color, msg) {
 }
 function checkLoseCondition() {
   if (
-    Array.from(document.querySelectorAll(".comp")).every((el) =>
+    Array.from(loseComponentsElements).every((el) =>
       el.classList.contains("visible")
     )
   ) {
