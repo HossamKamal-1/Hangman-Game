@@ -65,7 +65,8 @@ if (choosenWord.indexOf(" ") !== -1) {
 }
 
 // console.log(choosenWord);
-
+// making copy of the choosen word to display it when player lose
+let choosenWordCopy = choosenWord;
 let index = 0;
 // removing spaces from the word and making it uppercase
 choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
@@ -108,7 +109,7 @@ function checker() {
         display:flex;`;
         document
           .querySelector(".result-overlay")
-          .prepend(document.createTextNode("احسنت"));
+          .prepend(document.createTextNode("Well Done"));
       }, 1000);
     }
   } else {
@@ -127,7 +128,9 @@ function checker() {
       display:flex`;
       document
         .querySelector(".result-overlay")
-        .prepend(document.createTextNode("you lost"));
+        .prepend(
+          document.createTextNode(`you lost the word was "${choosenWordCopy}"`)
+        );
     }
   }
 }

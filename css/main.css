@@ -35,7 +35,14 @@ body {
   font-size: 40px;
   z-index: 9999;
   text-transform: uppercase;
+  text-align: center;
+
   gap: 20px;
+}
+@media (max-width: 767px) {
+  .result-overlay {
+    font-size: 27px;
+  }
 }
 .result-overlay .retry {
   background-color: #009688;
