@@ -123,7 +123,7 @@ function checkWinCondition() {
       (guessWord) => guessWord.innerHTML !== ""
     )
   ) {
-    playSoundFx("win");
+    setTimeout(() => playSoundFx("win"), 600);
     // stop interaction + removing keydown Event Listener when the player win + show msg
     showResultMsg("green", "Well Done");
   }
@@ -146,7 +146,7 @@ function checkLoseCondition() {
       el.classList.contains("visible")
     )
   ) {
-    playSoundFx("lose");
+    setTimeout(() => playSoundFx("lose"), 600);
     // stop interaction + removing keydown Event Listener when the player lose + show msg
     showResultMsg("red", `you lost the word was "${choosenWordCopy}"`);
   }
