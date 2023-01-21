@@ -73,7 +73,7 @@ choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
 lettersElements.forEach((letterElement) => {
   letterElement.onclick = checker;
 });
-document.addEventListener("keypress", keypressHandler);
+document.addEventListener("keydown", keypressHandler);
 
 function keypressHandler(e) {
   lettersElements.forEach((letterElement) => {
@@ -107,7 +107,7 @@ function checker() {
       // win Condition
       lettersContainer.style.pointerEvents = "none";
       // removing Event Listener when the player win
-      document.removeEventListener("keypress", keypressHandler);
+      document.removeEventListener("keydown", keypressHandler);
       setTimeout(() => {
         document.querySelector(".result-overlay").style.cssText = `
         color: green;
@@ -130,7 +130,7 @@ function checker() {
       // lose Condition
       lettersContainer.style.pointerEvents = "none";
       // removing Event Listener when the player lose
-      document.removeEventListener("keypress", keypressHandler);
+      document.removeEventListener("keydown", keypressHandler);
       document.querySelector(".result-overlay").style.cssText = `
       color: red;
       display:flex`;
