@@ -73,7 +73,9 @@ choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
 lettersElements.forEach((letterElement) => {
   letterElement.onclick = checker;
 });
-document.addEventListener("keypress", (e) => {
+document.addEventListener("keypress", keypressHandler);
+
+function keypressHandler(e) {
   lettersElements.forEach((letterElement) => {
     if (
       e.key.toUpperCase() === letterElement.innerHTML &&
@@ -86,7 +88,7 @@ document.addEventListener("keypress", (e) => {
       letterElement.click();
     }
   });
-});
+}
 function checker() {
   if (choosenWord.indexOf(this.innerHTML) !== -1) {
     document.querySelectorAll(".guess-word")[
@@ -102,8 +104,10 @@ function checker() {
         (guessWord) => guessWord.innerHTML !== ""
       )
     ) {
-      // win
+      // win Condition
       lettersContainer.style.pointerEvents = "none";
+      // removing Event Listener when the player win
+      document.removeEventListener("keypress", keypressHandler);
       setTimeout(() => {
         document.querySelector(".result-overlay").style.cssText = `
         color: green;
@@ -123,7 +127,10 @@ function checker() {
         el.classList.contains("visible")
       )
     ) {
+      // lose Condition
       lettersContainer.style.pointerEvents = "none";
+      // removing Event Listener when the player lose
+      document.removeEventListener("keypress", keypressHandler);
       document.querySelector(".result-overlay").style.cssText = `
       color: red;
       display:flex`;
