@@ -60,19 +60,20 @@ let lettersElements = document.querySelectorAll(".letter-box");
 // if there is 2 segment  word make space between 2 words
 if (choosenWord.indexOf(" ") !== -1) {
   document.querySelectorAll(".guess-word")[
-    choosenWord.indexOf(" ") - 1
-  ].style.marginRight = "20px";
+    choosenWord.indexOf(" ")
+  ].style.marginLeft = "20px";
 }
 
 // console.log(choosenWord);
 // making copy of the choosen word to display it when player lose
 let choosenWordCopy = choosenWord;
-let index = 0;
+let indexOfLoseComponent = 0;
 // removing spaces from the word and making it uppercase
 choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
 lettersElements.forEach((letterElement) => {
   letterElement.onclick = function () {
     if (choosenWord.indexOf(this.innerHTML) !== -1) {
+      playSoundFx("success");
       document.querySelectorAll(".guess-word")[
         choosenWord.indexOf(this.innerHTML)
       ].innerHTML = this.innerHTML;
@@ -84,8 +85,12 @@ lettersElements.forEach((letterElement) => {
       // checkinng wether all guess-words in html are not empty [ has character in html ]
       checkWinCondition();
     } else {
-      if (index < document.querySelectorAll(".comp").length) {
-        document.querySelectorAll(".comp")[index++].classList.add("visible");
+      this.classList.add("wrong");
+      playSoundFx("failure");
+      if (indexOfLoseComponent < document.querySelectorAll(".comp").length) {
+        document
+          .querySelectorAll(".comp")
+          [indexOfLoseComponent++].classList.add("visible");
       }
       // checking if all component elements has class visible or not
       checkLoseCondition();
@@ -101,6 +106,7 @@ function keyDownHandler(e) {
   lettersElements.forEach((letterElement) => {
     if (
       e.key.toUpperCase() === letterElement.innerHTML &&
+      !letterElement.classList.contains("wrong") &&
       lettersContainer.style.pointerEvents !== "none"
     ) {
       letterElement.classList.toggle("active");
@@ -117,6 +123,7 @@ function checkWinCondition() {
       (guessWord) => guessWord.innerHTML !== ""
     )
   ) {
+    playSoundFx("win");
     // stop interaction + removing keydown Event Listener when the player win + show msg
     showResultMsg("green", "Well Done");
   }
@@ -131,7 +138,7 @@ function showResultMsg(color, msg) {
     document
       .querySelector(".result-overlay")
       .prepend(document.createTextNode(msg));
-  }, 1000);
+  }, 800);
 }
 function checkLoseCondition() {
   if (
@@ -139,7 +146,13 @@ function checkLoseCondition() {
       el.classList.contains("visible")
     )
   ) {
+    playSoundFx("lose");
     // stop interaction + removing keydown Event Listener when the player lose + show msg
     showResultMsg("red", `you lost the word was "${choosenWordCopy}"`);
   }
+}
+
+function playSoundFx(soundId) {
+  document.getElementById(soundId).currentTime = 0;
+  document.getElementById(soundId).play();
 }

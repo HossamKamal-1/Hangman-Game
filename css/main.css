@@ -250,6 +250,10 @@ hr {
   cursor: pointer;
   transition: 0.3s;
 }
+.letters .letter-box.wrong {
+  background-color: #00968732;
+  pointer-events: none;
+}
 .letters .letter-box:hover {
   background-color: #e91e63;
 }
