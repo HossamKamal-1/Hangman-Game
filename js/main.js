@@ -71,11 +71,33 @@ let index = 0;
 // removing spaces from the word and making it uppercase
 choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
 lettersElements.forEach((letterElement) => {
-  letterElement.onclick = checker;
+  letterElement.onclick = function () {
+    if (choosenWord.indexOf(this.innerHTML) !== -1) {
+      document.querySelectorAll(".guess-word")[
+        choosenWord.indexOf(this.innerHTML)
+      ].innerHTML = this.innerHTML;
+      // replacing character of the choosen word with (.)
+      choosenWord = choosenWord.replace(
+        choosenWord.charAt(choosenWord.indexOf(this.innerHTML)),
+        "."
+      );
+      // checkinng wether all guess-words in html are not empty [ has character in html ]
+      checkWinCondition();
+    } else {
+      if (index < document.querySelectorAll(".comp").length) {
+        document.querySelectorAll(".comp")[index++].classList.add("visible");
+      }
+      // checking if all component elements has class visible or not
+      checkLoseCondition();
+    }
+  };
 });
-document.addEventListener("keydown", keypressHandler);
+document.addEventListener("keydown", keyDownHandler);
+document.querySelector(".retry").addEventListener("click", (e) => {
+  location.reload();
+});
 
-function keypressHandler(e) {
+function keyDownHandler(e) {
   lettersElements.forEach((letterElement) => {
     if (
       e.key.toUpperCase() === letterElement.innerHTML &&
@@ -89,60 +111,35 @@ function keypressHandler(e) {
     }
   });
 }
-function checker() {
-  if (choosenWord.indexOf(this.innerHTML) !== -1) {
-    document.querySelectorAll(".guess-word")[
-      choosenWord.indexOf(this.innerHTML)
-    ].innerHTML = this.innerHTML;
-    choosenWord = choosenWord.replace(
-      choosenWord.charAt(choosenWord.indexOf(this.innerHTML)),
-      "."
-    );
-    // checkinng wether all guess-words in html are not empty [ has character in html ]
-    if (
-      Array.from(document.querySelectorAll(".guess-word")).every(
-        (guessWord) => guessWord.innerHTML !== ""
-      )
-    ) {
-      // win Condition
-      lettersContainer.style.pointerEvents = "none";
-      // removing Event Listener when the player win
-      document.removeEventListener("keydown", keypressHandler);
-      setTimeout(() => {
-        document.querySelector(".result-overlay").style.cssText = `
-        color: green;
-        display:flex;`;
-        document
-          .querySelector(".result-overlay")
-          .prepend(document.createTextNode("Well Done"));
-      }, 1000);
-    }
-  } else {
-    if (index < document.querySelectorAll(".comp").length) {
-      document.querySelectorAll(".comp")[index++].classList.add("visible");
-    }
-    // checking if all component elements has class visible or not
-    if (
-      Array.from(document.querySelectorAll(".comp")).every((el) =>
-        el.classList.contains("visible")
-      )
-    ) {
-      // lose Condition
-      lettersContainer.style.pointerEvents = "none";
-      // removing Event Listener when the player lose
-      document.removeEventListener("keydown", keypressHandler);
-      document.querySelector(".result-overlay").style.cssText = `
-      color: red;
-      display:flex`;
-      document
-        .querySelector(".result-overlay")
-        .prepend(
-          document.createTextNode(`you lost the word was "${choosenWordCopy}"`)
-        );
-    }
+function checkWinCondition() {
+  if (
+    Array.from(document.querySelectorAll(".guess-word")).every(
+      (guessWord) => guessWord.innerHTML !== ""
+    )
+  ) {
+    // stop interaction + removing keydown Event Listener when the player win + show msg
+    showResultMsg("green", "Well Done");
   }
 }
-
-document.querySelector(".retry").addEventListener("click", (e) => {
-  location.reload();
-});
+function showResultMsg(color, msg) {
+  lettersContainer.style.pointerEvents = "none";
+  document.removeEventListener("keydown", keyDownHandler);
+  setTimeout(() => {
+    document.querySelector(".result-overlay").style.cssText = `
+    color: ${color};
+    display:flex;`;
+    document
+      .querySelector(".result-overlay")
+      .prepend(document.createTextNode(msg));
+  }, 1000);
+}
+function checkLoseCondition() {
+  if (
+    Array.from(document.querySelectorAll(".comp")).every((el) =>
+      el.classList.contains("visible")
+    )
+  ) {
+    // stop interaction + removing keydown Event Listener when the player lose + show msg
+    showResultMsg("red", `you lost the word was "${choosenWordCopy}"`);
+  }
+}
