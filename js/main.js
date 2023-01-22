@@ -9,9 +9,16 @@ arrayOfAlphabetLetters.forEach((letter) => {
   lettersContainer.appendChild(letterSpan);
 });
 
-fetchLocalWordsApi().then((wordsObj) => {
-  if (wordsObj === undefined) return;
-
+fetchLocalWordsApi(setupGame);
+async function fetchLocalWordsApi(setGame) {
+  try {
+    let data = await fetch("wordsAPI.json");
+    setGame(await data.json());
+  } catch (errorMsg) {
+    fireSweetAlert("Error", "Error Occured", "error");
+  }
+}
+function setupGame(wordsObj) {
   let choosenCateory =
     Object.keys(wordsObj)[
       Math.floor(Math.random() * Object.keys(wordsObj).length)
@@ -48,7 +55,7 @@ fetchLocalWordsApi().then((wordsObj) => {
   // removing spaces from the word and making it uppercase
   choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
   lettersElements.forEach((letterElement) => {
-    letterElement.onclick = function () {
+    letterElement.onclick = function clickHandler() {
       if (choosenWord.indexOf(this.innerHTML) !== -1) {
         playSoundFx("success");
         let indexOfLetter = choosenWord.indexOf(this.innerHTML);
@@ -56,7 +63,7 @@ fetchLocalWordsApi().then((wordsObj) => {
         // replacing character of the choosen word with (.)
         choosenWord = choosenWord.replace(choosenWord[indexOfLetter], ".");
         // checkinng wether all guess-words in html are not empty [ has character in html ]
-        checkWinCondition();
+        checkWinCondition(guessWordsSpans);
       } else {
         wrongAttemptSpan.innerHTML = ++wrongTries;
         this.classList.add("wrong");
@@ -67,84 +74,72 @@ fetchLocalWordsApi().then((wordsObj) => {
           );
         }
         // checking if all component elements has class visible or not
-        checkLoseCondition();
+        checkLoseCondition(loseComponentsElements, choosenWordCopy);
       }
     };
   });
 
-  document.addEventListener("keydown", keyDownHandler);
+  document.addEventListener("keydown", (e) =>
+    keyDownHandler(e, lettersElements)
+  );
+
   document
     .querySelector(".retry")
     .addEventListener("click", (e) => location.reload());
+}
 
-  function keyDownHandler(e) {
-    lettersElements.forEach((letterElement) => {
-      if (
-        e.key.toUpperCase() === letterElement.innerHTML &&
-        !letterElement.classList.contains("wrong") &&
-        lettersContainer.style.pointerEvents !== "none"
-      ) {
+function keyDownHandler(e, lettersElements) {
+  lettersElements.forEach((letterElement) => {
+    if (
+      e.key.toUpperCase() === letterElement.innerHTML &&
+      !letterElement.classList.contains("wrong") &&
+      lettersContainer.style.pointerEvents !== "none"
+    ) {
+      letterElement.classList.toggle("active");
+      setTimeout(() => {
         letterElement.classList.toggle("active");
-        setTimeout(() => {
-          letterElement.classList.toggle("active");
-        }, 150);
-        letterElement.click();
-      }
-    });
-  }
-  function checkWinCondition() {
-    if (
-      Array.from(guessWordsSpans).every(
-        (guessWord) => guessWord.innerHTML !== ""
-      )
-    ) {
-      setTimeout(() => playSoundFx("win"), 600);
-      // stop interaction + removing keydown Event Listener when the player win + show msg
-      showResultMsg("green", "Well Done");
+      }, 150);
+      letterElement.click();
     }
-  }
-  function showResultMsg(color, msg) {
-    lettersContainer.style.pointerEvents = "none";
-    document.removeEventListener("keydown", keyDownHandler);
-    setTimeout(() => {
-      document.querySelector(".result-overlay").style.cssText = `
-      color: ${color};
-      display:flex;`;
-      document
-        .querySelector(".result-overlay")
-        .prepend(document.createTextNode(msg));
-    }, 800);
-  }
-  function checkLoseCondition() {
-    if (
-      Array.from(loseComponentsElements).every((el) =>
-        el.classList.contains("visible")
-      )
-    ) {
-      setTimeout(() => playSoundFx("lose"), 600);
-      // stop interaction + removing keydown Event Listener when the player lose + show msg
-      showResultMsg("red", `you lost the word was "${choosenWordCopy}"`);
-    }
-  }
+  });
+}
 
-  function playSoundFx(soundId) {
-    document.getElementById(soundId).currentTime = 0;
-    document.getElementById(soundId).play();
+function checkWinCondition(guessWordsSpans) {
+  if (
+    Array.from(guessWordsSpans).every((guessWord) => guessWord.innerHTML !== "")
+  ) {
+    setTimeout(() => playSoundFx("win"), 600);
+    // stop interaction + removing keydown Event Listener when the player win + show msg
+    showResultMsg("green", "Well Done");
   }
-});
+}
 
-async function fetchLocalWordsApi() {
-  try {
-    let data = await fetch("wordsAPI.json").then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      return Promise.reject([response.status, response.statusText]);
-    });
-    return data;
-  } catch (errorMsg) {
-    fireSweetAlert(errorMsg[1], errorMsg[0], "error");
+function checkLoseCondition(loseComponents, choosenWordCopy) {
+  if (
+    Array.from(loseComponents).every((el) => el.classList.contains("visible"))
+  ) {
+    setTimeout(() => playSoundFx("lose"), 600);
+    // stop interaction + removing keydown Event Listener when the player lose + show msg
+    showResultMsg("red", `you lost the word was "${choosenWordCopy}"`);
   }
+}
+
+function showResultMsg(color, msg) {
+  lettersContainer.style.pointerEvents = "none";
+  document.removeEventListener("keydown", keyDownHandler);
+  setTimeout(() => {
+    document.querySelector(".result-overlay").style.cssText = `
+    color: ${color};
+    display:flex;`;
+    document
+      .querySelector(".result-overlay")
+      .prepend(document.createTextNode(msg));
+  }, 800);
+}
+
+function playSoundFx(soundId) {
+  document.getElementById(soundId).currentTime = 0;
+  document.getElementById(soundId).play();
 }
 
 function fireSweetAlert(
