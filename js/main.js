@@ -10,14 +10,16 @@ arrayOfAlphabetLetters.forEach((letter) => {
 });
 
 fetchLocalWordsApi(setupGame);
-async function fetchLocalWordsApi(setGame) {
+
+async function fetchLocalWordsApi() {
   try {
     let data = await fetch("wordsAPI.json");
-    setGame(await data.json());
+    setupGame(await data.json()); // Function Call
   } catch (errorMsg) {
     fireSweetAlert("Error", "Error Occured", "error");
   }
 }
+
 function setupGame(wordsObj) {
   let choosenCateory =
     Object.keys(wordsObj)[
@@ -33,7 +35,7 @@ function setupGame(wordsObj) {
 
   let lettersElements = document.querySelectorAll(".letter-box");
   // generating guess word in document
-  [...choosenWord.replaceAll(" ", "")].forEach((word) => {
+  [...choosenWord.replaceAll(" ", "")].forEach(() => {
     let guessWordSpan = document.createElement("span");
     guessWordSpan.className = "guess-word";
     document.querySelector(".letters-guess").appendChild(guessWordSpan);
@@ -56,6 +58,7 @@ function setupGame(wordsObj) {
   choosenWord = choosenWord.replaceAll(" ", "").toUpperCase();
   lettersElements.forEach((letterElement) => {
     letterElement.onclick = function clickHandler() {
+      // Letter Exists in the word
       if (choosenWord.indexOf(this.innerHTML) !== -1) {
         playSoundFx("success");
         let indexOfLetter = choosenWord.indexOf(this.innerHTML);
@@ -64,18 +67,17 @@ function setupGame(wordsObj) {
         choosenWord = choosenWord.replace(choosenWord[indexOfLetter], ".");
         // checkinng wether all guess-words in html are not empty [ has character in html ]
         checkWinCondition(guessWordsSpans);
-      } else {
-        wrongAttemptSpan.innerHTML = ++wrongTries;
-        this.classList.add("wrong");
-        playSoundFx("failure");
-        if (indexOfLoseComponent < loseComponentsElements.length) {
-          loseComponentsElements[indexOfLoseComponent++].classList.add(
-            "visible"
-          );
-        }
-        // checking if all component elements has class visible or not
-        checkLoseCondition(loseComponentsElements, choosenWordCopy);
+        return;
       }
+      // Letter doesn't exists in the word
+      wrongAttemptSpan.innerHTML = ++wrongTries;
+      this.classList.add("wrong");
+      playSoundFx("failure");
+      if (indexOfLoseComponent < loseComponentsElements.length) {
+        loseComponentsElements[indexOfLoseComponent++].classList.add("visible");
+      }
+      // checking if all component elements has class visible or not
+      checkLoseCondition(loseComponentsElements, choosenWordCopy);
     };
   });
 
